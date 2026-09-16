@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ascheriit-dkp/TrustTrace/raw/main/docs/report.schema.json",
+  "title": "trusttrace report v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "tool_version",
+    "command",
+    "start",
+    "end",
+    "processes",
+    "executions",
+    "files",
+    "network",
+    "hashes",
+    "diagnostics",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "tool_version": {
+      "type": "string"
+    },
+    "command": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "processes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/process"
+      }
+    },
+    "executions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/execution"
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    },
+    "network": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/connection"
+      }
+    },
+    "hashes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hash"
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    }
+  },
+  "$defs": {
+    "diagnostic": {
+      "type": "object",
+      "required": [
+        "code",
+        "count",
+        "message",
+        "loss"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "message": {
+          "type": "string"
+        },
+        "loss": {
+          "type": "boolean"
+        }
+      }
+    },
+    "process": {
+      "type": "object",
+      "required": [
+        "id",
+        "pid",
+        "tid",
+        "ppid",
+        "uid",
+        "thread",
+        "start",
+        "duration_ns"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "pid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ppid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "thread": {
+          "type": "boolean"
+        },
+        "executable": {
+          "type": "string"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "signal": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": [
+        "process_id",
+        "path",
+        "argv",
+        "uid",
+        "time"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "requested_path": {
+          "type": "string"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "required": [
+        "process_id",
+        "operation",
+        "path"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "read",
+            "create",
+            "write",
+            "rename",
+            "delete",
+            "load"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "kind": {"enum":["regular","directory","hardlink","symlink","node"]},
+        "flags": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "connection": {
+      "type": "object",
+      "required": [
+        "process_id",
+        "ip",
+        "port",
+        "protocol",
+        "result",
+        "status",
+        "time"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "scope_id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "result": {
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "connected",
+            "in_progress",
+            "failed"
+          ]
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "hash": {
+      "type": "object",
+      "required": [
+        "path",
+        "source"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "proc_exe",
+            "proc_root",
+            "path_after_exec",
+            "unavailable",
+            "test"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "processes",
+        "threads",
+        "executions",
+        "files_read",
+        "files_created",
+        "files_written",
+        "files_deleted",
+        "connections",
+        "duration_ns",
+        "exit_code",
+        "signal",
+        "incomplete"
+      ],
+      "properties": {
+        "processes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "threads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "executions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_read": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_created": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_written": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_deleted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "connections": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duration_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "signal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "incomplete": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

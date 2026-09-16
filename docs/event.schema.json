@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ascheriit-dkp/TrustTrace/raw/main/docs/event.schema.json",
+  "title": "trusttrace NDJSON v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "type",
+        "kind",
+        "time",
+        "monotonic_ns",
+        "process_id",
+        "pid",
+        "tid",
+        "ppid",
+        "uid",
+        "result"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "type": {
+          "const": "event"
+        },
+        "kind": {
+          "enum": [
+            "start",
+            "fork",
+            "exec",
+            "exit",
+            "open",
+            "write",
+            "read",
+            "rename",
+            "delete",
+            "connect",
+            "unsupported",
+            "unknown",
+            "load",
+            "create"
+          ]
+        },
+        "time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "monotonic_ns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "process_id": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "pid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ppid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uid": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "thread": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        },
+        "path2": {
+          "type": "string"
+        },
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "result": {
+          "type": "integer"
+        },
+        "flags": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_flags": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "created": {
+          "type": "boolean"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "regular": {
+          "type": "boolean"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "scope_id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "protection": {"type":"integer","minimum":0},
+        "mapping_flags": {"type":"integer","minimum":0},
+        "create_kind": {"enum":["directory","hardlink","symlink","node"]},
+        "hash": {
+          "$ref": "report.schema.json#/$defs/hash"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "type",
+        "report"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "type": {
+          "const": "report"
+        },
+        "report": {
+          "$ref": "report.schema.json"
+        }
+      }
+    }
+  ]
+}
