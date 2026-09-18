@@ -42,7 +42,8 @@ release: generate
 	mkdir -p dist
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build $(GO_FLAGS) -o dist/trusttrace-linux-amd64 ./cmd/trusttrace
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(GO) build $(GO_FLAGS) -o dist/trusttrace-linux-arm64 ./cmd/trusttrace
-	cd dist && sha256sum trusttrace-linux-* > SHA256SUMS
+	cp LICENSE THIRD_PARTY_NOTICES.md dist/
+	cd dist && sha256sum trusttrace-linux-amd64 trusttrace-linux-arm64 LICENSE THIRD_PARTY_NOTICES.md > SHA256SUMS
 	python3 scripts/verify-release.py dist
 
 clean:

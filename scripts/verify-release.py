@@ -8,16 +8,24 @@ import sys
 
 def main():
     directory = Path(sys.argv[1] if len(sys.argv) > 1 else "dist")
-    expected = {"trusttrace-linux-amd64": 62, "trusttrace-linux-arm64": 183}
+    machines = {"trusttrace-linux-amd64": 62, "trusttrace-linux-arm64": 183}
+    notices = {"LICENSE", "THIRD_PARTY_NOTICES.md"}
+    expected = set(machines) | notices
     checksums = {}
     for line in (directory / "SHA256SUMS").read_text().splitlines():
         digest, name = line.split()
         assert name not in checksums, f"duplicate checksum: {name}"
         checksums[name] = digest
-    assert checksums.keys() == expected.keys(), "unexpected release file list"
-    for name, machine in expected.items():
+    assert checksums.keys() == expected, "unexpected release file list"
+    for name in sorted(expected):
         data = (directory / name).read_bytes()
         assert hashlib.sha256(data).hexdigest() == checksums[name], name
+        if name in notices:
+            source = Path(__file__).resolve().parent.parent / name
+            assert data and data == source.read_bytes(), f"missing or altered notice: {name}"
+            print(f"{name}: checksum and unchanged notice verified")
+            continue
+        machine = machines[name]
         assert data[:6] == b"\x7fELF\x02\x01", f"not ELF64 little endian: {name}"
         assert struct.unpack_from("<HH", data, 16) == (2, machine), name
         offset = struct.unpack_from("<Q", data, 32)[0]

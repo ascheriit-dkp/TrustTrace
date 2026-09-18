@@ -1,9 +1,10 @@
 # Level 1 validation
 
-Validation date: 2026-09-16. This records local execution of the working tree,
-not a GitHub Actions run or a published release.
+Local validation date: 2026-09-16. The local evidence below is preserved from
+that working-tree validation. A separate hosted-CI section records successful
+GitHub Actions runs for PR #1. No GitHub release has been published.
 
-## Environment
+## Local environment
 
 - Linux kernel **6.12.31-0-virt**, Alpine 3.22.0, on amd64 and arm64.
 - Real kernel BPF verifier, BTF relocation, tracepoint attachment and syscalls
@@ -15,7 +16,7 @@ not a GitHub Actions run or a published release.
   linking. All four packages, including privileged collector and CLI tests,
   execute in the guest. The race guest has 2 GiB RAM.
 
-## Completed checks
+## Completed local checks
 
 | Check | Result |
 |---|---|
@@ -43,9 +44,10 @@ on arm64. Both kernels exercise actual ring-buffer saturation and pending-map
 exhaustion; the final normal runs report 29 ring losses and one map insertion
 failure in those deliberately constrained tests.
 
-## Release artifacts
+## Original local review artifacts
 
-Local review builds are in ignored `dist/`, with `SHA256SUMS`. The version and
+The original local review builds were generated in ignored `dist/`, with `SHA256SUMS`.
+Subsequent release-prep builds replace those local artifacts. The version and
 commit label deliberately identify an uncommitted review build; they are not
 a release tag. The builds use the Makefile's release Go flags: disabled CGO,
 `-trimpath`, `-buildvcs=false`, stripped symbols, empty build ID and injected
@@ -58,7 +60,7 @@ version/commit. No local user source paths remain in the binaries or BPF objects
 
 The host is Windows: BPF and Go release commands were executed explicitly with
 the same flags, using Zig's BPF target. Linux Make/Clang and hosted workflow
-execution remain CI checks; workflow configuration was linted locally.
+execution subsequently passed in the hosted CI runs recorded below.
 `make release` now verifies architecture, static linkage and checksums itself.
 
 ## Fixes and interpretation
@@ -75,8 +77,10 @@ or relaxing the test assertions/timeouts. Timings from these guests are not
 performance measurements.
 
 The compatibility target remains Linux 5.15+, but **only 6.12.31 was kernel-tested
-in this validation**. Other kernels, distribution lockdown policies, native
-hardware timing, arm64 race detection and hosted CI are not claimed as tested.
+in this local validation**. The hosted runners separately passed the checks
+listed below, including arm64 unit race tests. This does not establish support
+for every kernel or distribution lockdown policy, or provide hardware performance
+measurements.
 See [LIMITATIONS.md](LIMITATIONS.md) for collection boundaries and
 [LEVEL1_REVIEW.md](LEVEL1_REVIEW.md) for the original specification review.
 
@@ -94,3 +98,45 @@ python3 scripts/validate-vm-log.py bin/validation-amd64.log \
   bin/validation-arm64-final.log bin/validation-race-final.log
 python3 scripts/verify-release.py dist
 ```
+
+## GitHub-hosted CI — PR #1
+
+On 2026-09-16, commit `fe03bf7d54b4e96d3c850b0b6b7617efa1106e28` passed
+[PR #1 CI run 35106596246](https://github.com/ascheriit-dkp/TrustTrace/actions/runs/35106596246).
+The [branch-push run 35105047959](https://github.com/ascheriit-dkp/TrustTrace/actions/runs/35105047959)
+also passed. Job results and Linux integration logs were inspected.
+
+| GitHub-hosted job | Result and executed checks |
+|---|---|
+| Ubuntu 24.04 amd64 | Pass: regenerate BPF objects with Clang; formatting, unit tests, vet, unit race tests, privileged kernel/CLI integration, CLI smoke tests and release build/checksum verification |
+| Ubuntu 24.04 arm64 | Pass: the same Linux checks, including real kernel/CLI integration and unit race tests |
+| Windows | Pass: unit tests and `go vet` |
+
+Kernel tests actually executed on both Linux runners; they were not bypassed
+for missing BTF. The i386 compatibility fixture passed on amd64 and correctly
+skipped on arm64. Hosted `go test -race ./...` runs unit tests;
+privileged integration runs separately without the race detector. The local
+amd64 race evidence above additionally covers privileged integration.
+
+These are successful hosted checks of the published Level 1 commit, distinct
+from the earlier local QEMU validation. Release-prep changes dated 2026-09-18
+are subject to fresh push/PR CI on the same branch. The tag-triggered draft
+release upload is not executed by PR CI and has not been triggered.
+
+## Release-prep local checks — 2026-09-18
+
+- Dependency inventories for both static Linux targets contain only cilium/ebpf
+  v0.19.0 and x/sys v0.31.0 beyond the Go runtime/standard library. Upstream
+  licenses, Go-vendored x/net notices and additional source-level notices are
+  reproduced in `THIRD_PARTY_NOTICES.md`.
+- Formatting, fresh Windows unit tests, Windows/Linux amd64/Linux arm64 vet,
+  module verification and `go mod tidy -diff` pass.
+- actionlint 1.7.7, workflow YAML parsing and Python helper syntax checks pass.
+- Both Linux release binaries build with disabled CGO and version `v0.1.0`.
+  ELF architecture/static-linkage checks and SHA-256 verification pass.
+- The release directory contains both binaries, `SHA256SUMS`, `LICENSE` and
+  `THIRD_PARTY_NOTICES.md`; the two notices match the repository files exactly.
+  The verifier rejects missing notices and altered notices even when an altered
+  file's checksum is recomputed. All five assets are explicitly listed for upload.
+- Collector source and embedded BPF objects are unchanged. Fresh Linux race
+  and privileged integration checks are performed by the branch's CI workflow.

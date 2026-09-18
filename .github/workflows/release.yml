@@ -25,4 +25,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_VERSION" dist/* --draft --verify-tag --title "trusttrace $RELEASE_VERSION" --notes-file docs/RELEASE_NOTES.md
+        run: |
+          gh release create "$RELEASE_VERSION" \
+            dist/trusttrace-linux-amd64 dist/trusttrace-linux-arm64 \
+            dist/SHA256SUMS dist/LICENSE dist/THIRD_PARTY_NOTICES.md \
+            --draft --verify-tag --title "trusttrace $RELEASE_VERSION" \
+            --notes-file docs/RELEASE_NOTES.md

@@ -79,7 +79,8 @@ If a TCG guest exhibits host-clock jumps or watchdog stalls, use
 `-accel tcg,thread=single -icount shift=auto,sleep=on` to drive its clock from
 emulated instructions. This is a test environment, not a performance benchmark.
 
-`make release` also runs `scripts/verify-release.py`: the two named artifacts
-must match their SHA-256 checksums, have the expected ELF architectures and
-contain no dynamic loader or dynamic-linking segment. See [VALIDATION.md](VALIDATION.md)
+`make release` also runs `scripts/verify-release.py`: both binaries must match
+their SHA-256 checksums, have the expected ELF architectures and contain no
+dynamic loader or dynamic-linking segment. `LICENSE` and `THIRD_PARTY_NOTICES.md`
+must be copied unchanged and match their checksums. See [VALIDATION.md](VALIDATION.md)
 for the completed runs and [LEVEL1_REVIEW.md](LEVEL1_REVIEW.md) for specification coverage.

@@ -1,4 +1,4 @@
-# trusttrace — initial release
+# trusttrace v0.1.0 - 2026-09-18
 
 Observe one command and its descendants. Produce a local forensic receipt.
 
@@ -10,8 +10,9 @@ Observe one command and its descendants. Produce a local forensic receipt.
 
 ## Requirements
 
-Linux 5.15+ with kernel BTF, BPF syscall support and raw syscall tracepoints.
+Targets Linux 5.15+ with kernel BTF, BPF syscall support and raw syscall tracepoints.
 Root or equivalent BPF/perf privileges. Native 64-bit targets only.
+See docs/VALIDATION.md for local and GitHub-hosted test results.
 
 ## Known limits
 
@@ -21,5 +22,10 @@ not covered. Path and argument capture is bounded. No sandboxing is provided.
 
 ## Verification
 
-Compare the downloaded binary against SHA256SUMS. Checksums detect accidental
+Assets: `trusttrace-linux-amd64`, `trusttrace-linux-arm64`, `SHA256SUMS`,
+`LICENSE` and `THIRD_PARTY_NOTICES.md`. Keep both notice files with redistributed
+binaries. `SHA256SUMS` covers both binaries and both notice files.
+
+Download all five assets into one directory and run `sha256sum -c SHA256SUMS`.
+Checksums detect accidental
 corruption; this release does not provide signed binaries or signed receipts.

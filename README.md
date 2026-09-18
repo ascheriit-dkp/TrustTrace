@@ -54,7 +54,12 @@ make generate build
 ```
 
 Release builds embed the BPF objects and need no compiler at runtime.
-Use `make release VERSION=v0.1.0` to build both architectures and checksums.
+Building a release requires Clang's BPF backend and Python 3 as well as Go/Make.
+Use `make release VERSION=v0.1.0` to build both architectures, `SHA256SUMS`,
+`LICENSE` and `THIRD_PARTY_NOTICES.md` in `dist/`. This command builds locally;
+it does not tag or publish a release. Verify with `(cd dist && sha256sum -c SHA256SUMS)`.
+Keep both notice files with redistributed binaries. The tag-triggered GitHub
+workflow uploads these five assets to a draft release for review.
 
 ## Receipts and diff
 
